@@ -1,0 +1,81 @@
+name:                advent-of-code
+version:             0.1.0.0
+github:              "soverysour/advent-of-code"
+license:             BSD3
+author:              "soverysour"
+maintainer:          "sebi.f@tuta.io"
+copyright:           "BSD3"
+
+extra-source-files:
+- README.md
+
+synopsis:            Advent of Code 2019 solutions
+category:            advent-of-code
+
+description:         Please see the README on GitHub at <https://github.com/soverysour/advent-of-code#readme>
+
+ghc-options:
+  - -Weverything
+  - -Werror
+  - -Wno-safe
+  - -Wno-unsafe
+  - -Wno-missing-import-lists
+  - -Wno-missed-specialisations
+  - -Wno-all-missed-specialisations
+  - -Wno-missing-local-signatures
+  - -Wno-monomorphism-restriction
+
+default-extensions:
+  - EmptyCase
+  - FlexibleContexts
+  - FlexibleInstances
+  - InstanceSigs
+  - MultiParamTypeClasses
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - GeneralizedNewtypeDeriving
+  - StandaloneDeriving
+  - OverloadedStrings
+  - NoImplicitPrelude
+  - ScopedTypeVariables
+  - TypeApplications
+  - TypeOperators
+  - MultiWayIf
+  - NamedFieldPuns
+  - TupleSections
+  - DisambiguateRecordFields
+  - RecordWildCards
+
+dependencies:
+- base >= 4.7 && < 5
+- classy-prelude
+- text
+
+library:
+  source-dirs: src
+
+executables:
+  advent-of-code-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - advent-of-code
+
+tests:
+  advent-of-code-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - advent-of-code
