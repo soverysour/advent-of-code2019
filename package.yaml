@@ -54,6 +54,8 @@ dependencies:
 - base >= 4.7 && < 5
 - classy-prelude
 - text
+- vector
+- transformers
 
 library:
   source-dirs: src

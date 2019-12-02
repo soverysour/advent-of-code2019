@@ -4,7 +4,7 @@ module Main
 
 import           ClassyPrelude
 
-import           Prob1
+import           Prob2
 
 main :: IO ()
-main = readFileUtf8 "input.in" >>= solve2
+main = main1
