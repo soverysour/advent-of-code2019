@@ -55,6 +55,7 @@ dependencies:
 - classy-prelude
 - text
 - vector
+- containers
 - transformers
 
 library:
