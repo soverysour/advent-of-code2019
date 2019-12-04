@@ -6,15 +6,15 @@ module Prob3
   , solve2
   ) where
 
--- TODO: Use a Map ( O: )
 import           ClassyPrelude
-import qualified Data.Set       as S
-import qualified Data.Text      as T
-import qualified Data.Text.Read as T
+import qualified Data.Map.Strict as M
+import qualified Data.Set        as S
+import qualified Data.Text       as T
+import qualified Data.Text.Read  as T
 
 type Pos = (Int, Int)
 
-type StateV = (Pos, Int, S.Set (Int, Pos))
+type StateV = (Pos, Int, M.Map Pos Int)
 
 data Direction
   = DLeft
@@ -53,7 +53,8 @@ solve1 txt = do
       let (_, _, firstSet) = perform orders1
           (_, _, secondSet) = perform orders2
       print . closestIntersection $
-        S.map snd firstSet `S.intersection` S.map snd secondSet
+        S.fromList (M.keys firstSet) `S.intersection`
+        S.fromList (M.keys secondSet)
     _ -> print ("Bad input." :: Text)
 
 solve2 :: Text -> IO ()
@@ -63,40 +64,40 @@ solve2 txt = do
     Just [orders1, orders2] -> do
       let (_, _, firstSet) = perform orders1
           (_, _, secondSet) = perform orders2
-      print $
-        getMin . catMaybes $ S.toList $ S.map (pairwise firstSet) secondSet
+      print . getMin . catMaybes . M.elems $
+        M.mapWithKey (pairwise firstSet) secondSet
     _ -> print ("Bad input." :: Text)
 
 initialState :: StateV
-initialState = ((0, 0), 0, S.empty)
+initialState = ((0, 0), 0, M.empty)
 
 perform :: [Order] -> StateV
 perform [] = initialState
 perform (x:xs) = flip (foldl' combine) xs . extract00 $ combine initialState x
   where
     extract00 (pos, act, set) =
-      (pos, act, S.filter (\(_, v) -> v /= (0, 0)) set)
+      (pos, act, M.filterWithKey (\v _ -> v /= (0, 0)) set)
 
 combine :: StateV -> Order -> StateV
 combine ((x, y), act, set) (DRight, move) =
   ( (x + move, y)
   , act + move
-  , S.fromList (zip [act .. act + move] ((, y) <$> [x .. x + move])) `S.union`
+  , M.fromList (zip ((, y) <$> [x .. x + move]) [act .. act + move]) `M.union`
     set)
 combine ((x, y), act, set) (DUp, move) =
   ( (x, y + move)
   , act + move
-  , S.fromList (zip [act .. act + move] ((x, ) <$> [y .. y + move])) `S.union`
+  , M.fromList (zip ((x, ) <$> [y .. y + move]) [act .. act + move]) `M.union`
     set)
 combine ((x, y), act, set) (DLeft, move) =
   ( (x - move, y)
   , act + move
-  , S.fromList (zip [act .. act + move] ((, y) <$> [x,x - 1 .. x - move])) `S.union`
+  , M.fromList (zip ((, y) <$> [x,x - 1 .. x - move]) [act .. act + move]) `M.union`
     set)
 combine ((x, y), act, set) (DDown, move) =
   ( (x, y - move)
   , act + move
-  , S.fromList (zip [act .. act + move] ((x, ) <$> [y,y - 1 .. y - move])) `S.union`
+  , M.fromList (zip ((x, ) <$> [y,y - 1 .. y - move]) [act .. act + move]) `M.union`
     set)
 
 closestIntersection :: Set Pos -> Maybe Int
@@ -110,11 +111,11 @@ closestIntersection = S.foldl' f Nothing
             then Just manhattan'
             else Just v
 
-pairwise :: Set (Int, Pos) -> (Int, Pos) -> Maybe Int
-pairwise set (cost, pos) =
-  case S.toList $ S.filter (\(_, pos') -> pos == pos') set of
-    [(cost', _)] -> Just $ cost + cost'
-    _            -> Nothing
+pairwise :: Map Pos Int -> Pos -> Int -> Maybe Int
+pairwise map' pos cost =
+  case map' M.!? pos of
+    Nothing    -> Nothing
+    Just cost' -> Just $ cost + cost'
 
 getMin :: [Int] -> Maybe Int
 getMin [] = Nothing
