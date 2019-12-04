@@ -4,7 +4,7 @@ module Main
 
 import           ClassyPrelude
 
-import           Prob3
+import           Prob4
 
 main :: IO ()
 main = main1
